@@ -1,0 +1,6 @@
+Epoch 1/5 | Loss: 0.8810 | Val Acc: 0.8746
+Epoch 2/5 | Loss: 0.4150 | Val Acc: 0.8985
+Epoch 3/5 | Loss: 0.3490 | Val Acc: 0.9063
+Epoch 4/5 | Loss: 0.3159 | Val Acc: 0.9152
+Epoch 5/5 | Loss: 0.2933 | Val Acc: 0.9187
+Training complete!

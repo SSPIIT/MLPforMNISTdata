@@ -2,9 +2,10 @@
 Main Neural Network Model class
 Handles forward and backward propagation loops
 """
-from ann.activations import ReLU
+from ann.activations import ReLU, Sigmoid, Tanh
 from ann.neural_layer import LinearLayer
 from ann.objective_functions import CrossEntropy
+from ann.optimizers import SGD, Momentum, NAG, RMSProp
 import numpy as np
 
 class NeuralNetwork:
@@ -13,16 +14,54 @@ class NeuralNetwork:
     """
 
     def __init__(self, cli_args):
+
         input_dim = 784
-        hidden_dim = 128
         output_dim = 10
+
+        hidden_layers = cli_args.hidden_layers
+        neurons = cli_args.num_neurons
+        weight_init = cli_args.weight_init
+        activation_name = cli_args.activation
+        if activation_name == "relu":
+            activation = ReLU
+        elif activation_name == "sigmoid":
+            activation = Sigmoid
+        elif activation_name == "tanh":
+            activation = Tanh
+
         self.loss_fn = CrossEntropy()
-        self.layers = [
-            LinearLayer(input_dim, hidden_dim, weight_init="xavier"),
-            ReLU(),
-            LinearLayer(hidden_dim, output_dim, weight_init="xavier")
-        ]
-        self.lr = 0.01
+
+        self.layers = []
+
+        prev_dim = input_dim
+        for _ in range(hidden_layers):
+
+            self.layers.append(
+                LinearLayer(prev_dim, neurons, weight_init=weight_init)
+            )
+
+            self.layers.append(activation())
+
+            prev_dim = neurons
+        self.layers.append(
+            LinearLayer(prev_dim, output_dim, weight_init=weight_init)
+        )
+
+        self.lr = cli_args.learning_rate
+
+        opt = cli_args.optimizer
+
+        if opt == "sgd":
+            self.optimizer = SGD(cli_args.learning_rate)
+
+        elif opt == "momentum":
+            self.optimizer = Momentum(cli_args.learning_rate)
+
+        elif opt == "nag":
+            self.optimizer = NAG(cli_args.learning_rate)
+
+        elif opt == "rmsprop":
+            self.optimizer = RMSProp(cli_args.learning_rate)
 
     def forward(self, X):
         """
@@ -74,8 +113,12 @@ class NeuralNetwork:
 
         for layer in reversed(self.layers):
             if hasattr(layer, "grad_W"):
-                layer.W -= self.lr*self.grad_W[grad_index]
-                layer.b -= self.lr*self.grad_b[grad_index]
+                self.optimizer.update(
+                    grad_index,
+                    layer,
+                    self.grad_W[grad_index],
+                    self.grad_b[grad_index]
+                )
                 grad_index += 1
 
     def train(self, X_train, y_train, X_val=None, y_val=None, epochs=5, batch_size=32):
@@ -101,11 +144,17 @@ class NeuralNetwork:
 
             avg_loss = epoch_loss / (n // batch_size)
 
-            if X_val is not None:
-                val_acc = self.evaluate(X_val, y_val)
-                print(f"Epoch {epoch+1}/{epochs} | Loss: {avg_loss:.4f} | Val Acc: {val_acc:.4f}")
-            else:
-                print(f"Epoch {epoch+1}/{epochs} | Loss: {avg_loss:.4f}")
+
+            import wandb
+
+            val_acc = self.evaluate(X_val, y_val)
+            print(f"Epoch {epoch+1}/{epochs} | Loss: {avg_loss:.4f} | Val Acc: {val_acc:.4f}")
+
+            wandb.log({
+                "epoch": epoch+1,
+                "loss": avg_loss,
+                "val_accuracy": val_acc
+            })
 
     def evaluate(self, X, y):
         logits = self.forward(X)

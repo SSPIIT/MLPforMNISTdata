@@ -4,6 +4,7 @@ Entry point for training neural networks with command-line arguments
 """
 
 import argparse
+import wandb
 
 def parse_arguments():
     """
@@ -67,6 +68,10 @@ def main():
     Main training function.
     """
     args = parse_arguments()
+    wandb.init(
+        project=args.wandb_project,
+        config=vars(args)
+    )
     X_train, y_train, X_test, y_test = load_data(args.dataset)
     model = NeuralNetwork(args)
     model.lr = args.learning_rate
