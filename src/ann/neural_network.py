@@ -22,6 +22,7 @@ class NeuralNetwork:
             ReLU(),
             LinearLayer(hidden_dim, output_dim, weight_init="xavier")
         ]
+        self.lr = 0.01
 
     def forward(self, X):
         """
@@ -49,7 +50,7 @@ class NeuralNetwork:
         grad_b_list = []
 
         # Backprop through layers in reverse; collect grads so that index 0 = last layer
-        _ = self.loss_fn.forward(y_pred, y_true)
+        # _ = self.loss_fn.forward(y_pred, y_true)
         dZ = self.loss_fn.backward(y_pred, y_true)
         for layer in reversed(self.layers):
             if hasattr(layer, "backward"):
@@ -64,25 +65,68 @@ class NeuralNetwork:
             self.grad_W[i] = gw
             self.grad_b[i] = gb
 
-        print("Shape of grad_Ws:", self.grad_W.shape, self.grad_W[1].shape)
-        print("Shape of grad_bs:", self.grad_b.shape, self.grad_b[1].shape)
+        # print("Shape of grad_Ws:", self.grad_W.shape, self.grad_W[1].shape)
+        # print("Shape of grad_bs:", self.grad_b.shape, self.grad_b[1].shape)
         return self.grad_W, self.grad_b
 
-    # def update_weights(self):
-    #     pass
+    def update_weights(self):
+        grad_index = 0
 
-    # def train(self, X_train, y_train, epochs=1, batch_size=32):
-    #     pass
+        for layer in reversed(self.layers):
+            if hasattr(layer, "grad_W"):
+                layer.W -= self.lr*self.grad_W[grad_index]
+                layer.b -= self.lr*self.grad_b[grad_index]
+                grad_index += 1
 
-    # def evaluate(self, X, y):
-    #     pass
+    def train(self, X_train, y_train, X_val=None, y_val=None, epochs=5, batch_size=32):
+        n = X_train.shape[0]
 
-    # def get_weights(self):
-    #     d = {}
-    #     for i, layer in enumerate(self.layers):
-    #         d[f"W{i}"] = layer.W.copy()
-    #         d[f"b{i}"] = layer.b.copy()
-    #     return d
+        for epoch in range(epochs):
+            epoch_loss = 0
+
+            indices = np.random.permutation(n)
+            X_train = X_train[indices]
+            y_train = y_train[indices]
+
+            for i in range(0, n, batch_size):
+                X_batch = X_train[i:i+batch_size]
+                y_batch = y_train[i:i+batch_size]
+
+                logits = self.forward(X_batch)
+                loss = self.loss_fn.forward(logits, y_batch)
+                epoch_loss += loss
+
+                self.backward(y_batch, logits)
+                self.update_weights()
+
+            avg_loss = epoch_loss / (n // batch_size)
+
+            if X_val is not None:
+                val_acc = self.evaluate(X_val, y_val)
+                print(f"Epoch {epoch+1}/{epochs} | Loss: {avg_loss:.4f} | Val Acc: {val_acc:.4f}")
+            else:
+                print(f"Epoch {epoch+1}/{epochs} | Loss: {avg_loss:.4f}")
+
+    def evaluate(self, X, y):
+        logits = self.forward(X)
+        preds = np.argmax(logits, axis=1)
+        true = np.argmax(y, axis=1)
+
+        accuracy = np.mean(preds == true)
+        return accuracy
+
+    def get_weights(self):
+        d = {}
+        idx = 0
+
+        for layer in self.layers:
+            if hasattr(layer, "W"):   # only linear layers
+                d[f"W{idx}"] = layer.W.copy()
+                d[f"b{idx}"] = layer.b.copy()
+                idx += 1
+
+        return d
+
 
     # def set_weights(self, weight_dict):
     #     for i, layer in enumerate(self.layers):
