@@ -21,9 +21,17 @@ class NeuralNetwork:
         input_dim = 784
         output_dim = 10
 
-        hidden_layers = cli_args.num_layers
-        neurons = cli_args.hidden_size
+        hidden_layers = getattr(cli_args, "num_layers", None)
 
+        if hidden_layers is None:
+            hidden_layers = getattr(cli_args, "hidden_layers", 1)
+
+        neurons = getattr(cli_args, "hidden_size", None)
+
+        if neurons is None:
+            neurons = getattr(cli_args, "num_neurons", 128)
+        if isinstance(neurons, int):
+            neurons = [neurons] * hidden_layers
         # ensure hidden_size is list
         if isinstance(neurons, int):
             neurons = [neurons] * hidden_layers
