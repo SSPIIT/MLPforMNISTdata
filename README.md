@@ -13,6 +13,9 @@ This assignment requires you to implement a neural network from scratch using on
 - Train and evaluate neural networks
 - Log experiments using Weights & Biases
 
+## W&B Report 
+[Link Text](https://api.wandb.ai/links/sspiit-iitm-india/c26c8knx)
+
 ## Contact
 
 For questions or issues, please contact the teaching staff or post on the course forum.
