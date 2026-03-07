@@ -54,7 +54,7 @@ def parse_arguments():
                         choices=['cross_entropy', 'mse'])
 
     parser.add_argument('-w_i', '--weight_init', type=str, default='xavier',
-                        choices=['random', 'xavier'])
+                        choices=['random', 'xavier','zeros'])
 
     parser.add_argument('-w_p', '--wandb_project', type=str, default='DL_Assignment')
 

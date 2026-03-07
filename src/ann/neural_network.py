@@ -145,6 +145,8 @@ class NeuralNetwork:
 
                 self.backward(y_batch, logits)
                 
+                grad_layer = self.grad_W[0] 
+                grad_layer = self.grad_W[0]  # gradients of last layer
 
                 grad_norm = np.mean([np.linalg.norm(g) for g in self.grad_W])
 

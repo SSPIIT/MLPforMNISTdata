@@ -14,6 +14,9 @@ class LinearLayer:
         elif weight_init == "xavier":
             limit = np.sqrt(6 / (input_dim + output_dim))
             self.W = np.random.uniform(-limit, limit, (input_dim,output_dim))
+        elif weight_init == "zeros":
+            self.W = np.zeros((input_dim, output_dim))
+            self.b = np.zeros((1, output_dim))
         else: 
             raise ValueError("Invalid weight initialization")
         

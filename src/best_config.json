@@ -9,7 +9,7 @@
     "num_neurons": 128,
     "activation": "relu",
     "loss": "cross_entropy",
-    "weight_init": "xavier",
+    "weight_init": "zeros",
     "wandb_project": "DL_Assignment",
     "model_save_path": "src/best_model.npy"
 }
