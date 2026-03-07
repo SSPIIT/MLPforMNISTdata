@@ -19,8 +19,8 @@ class NeuralNetwork:
         input_dim = 784
         output_dim = 10
 
-        hidden_layers = cli_args.hidden_layers
-        neurons = cli_args.num_neurons
+        hidden_layers = cli_args.num_layers
+        neurons = cli_args.hidden_size
         weight_init = cli_args.weight_init
         activation_name = cli_args.activation
         activation_map = {
@@ -35,15 +35,12 @@ class NeuralNetwork:
         self.layers = []
 
         prev_dim = input_dim
-        for _ in range(hidden_layers):
-
+        for i in range(hidden_layers):
             self.layers.append(
-                LinearLayer(prev_dim, neurons, weight_init=weight_init)
+                LinearLayer(prev_dim, neurons[i], weight_init=weight_init)
             )
-
             self.layers.append(activation())
-
-            prev_dim = neurons
+            prev_dim = neurons[i]
         self.layers.append(
             LinearLayer(prev_dim, output_dim, weight_init=weight_init)
         )

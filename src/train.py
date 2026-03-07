@@ -4,6 +4,7 @@ Entry point for training neural networks with command-line arguments
 """
 
 import argparse
+from html import parser
 import wandb
 import json
 
@@ -42,10 +43,8 @@ def parse_arguments():
     parser.add_argument('-o', '--optimizer', type=str, default='rmsprop',
                         choices=['sgd', 'momentum', 'nag', 'rmsprop'])
 
-    parser.add_argument('-nhl','--hidden_layers', type=int, default=3)
-
-
-    parser.add_argument('-sz','--num_neurons', type=int, default=128)
+    parser.add_argument('--num_layers', type=int, default=3)
+    parser.add_argument('--hidden_size', type=int, nargs='+', default=[128,128,128])
 
     parser.add_argument('-a', '--activation', type=str, default='relu',
                         choices=['relu', 'sigmoid', 'tanh'])
