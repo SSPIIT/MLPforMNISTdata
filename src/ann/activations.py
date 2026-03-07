@@ -1,44 +1,62 @@
 """
 Activation Functions and Their Derivatives
-Implements: ReLU, Sigmoid, Tanh, Softmax
+Implements: ReLU, Sigmoid, Tanh
 """
 
 import numpy as np
 
+
 class Sigmoid:
+
     def __init__(self):
-        self.Z = None
+        self.out = None
 
     def forward(self, Z):
-        self.Z = Z
-        return 1 / (1+ np.exp(-Z))
-    
+
+        self.out = 1 / (1 + np.exp(-Z))
+
+        return self.out
+
     def backward(self, dA):
-        sig = 1 / (1 + np.exp(-self.Z))
-        dZ = dA * sig * (1 - sig)
+
+        dZ = dA * self.out * (1 - self.out)
+
         return dZ
-        
+
+
 class Tanh:
+
     def __init__(self):
-        self.Z = None
+        self.out = None
 
     def forward(self, Z):
-        self.Z = Z
-        return np.tanh(Z)
-    
+
+        self.out = np.tanh(Z)
+
+        return self.out
+
     def backward(self, dA):
-        t = np.tanh(self.Z)
-        dZ = dA * (1 - t**2)
+
+        dZ = dA * (1 - self.out ** 2)
+
         return dZ
-    
+
+
 class ReLU:
+
     def __init__(self):
         self.Z = None
 
     def forward(self, Z):
+
         self.Z = Z
-        return np.maximum(0,Z)
-    
+
+        return np.maximum(0, Z)
+
     def backward(self, dA):
-        dZ = dA * (self.Z > 0)
+
+        dZ = dA.copy()
+
+        dZ[self.Z <= 0] = 0
+
         return dZ
