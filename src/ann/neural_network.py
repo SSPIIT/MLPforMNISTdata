@@ -21,6 +21,11 @@ class NeuralNetwork:
 
         hidden_layers = cli_args.num_layers
         neurons = cli_args.hidden_size
+        # ensure hidden_size is a list
+        if isinstance(neurons, int):
+            neurons = [neurons] * hidden_layers
+        elif len(neurons) != hidden_layers:
+            neurons = neurons + [neurons[-1]] * (hidden_layers - len(neurons))
         weight_init = cli_args.weight_init
         activation_name = cli_args.activation
         activation_map = {
@@ -143,7 +148,6 @@ class NeuralNetwork:
                 self.backward(y_batch, logits)
                 
                 grad_layer = self.grad_W[0] 
-                grad_layer = self.grad_W[0]  # gradients of last layer
 
                 grad_norm = np.mean([np.linalg.norm(g) for g in self.grad_W])
 
@@ -196,11 +200,10 @@ class NeuralNetwork:
 
 
     def set_weights(self, weight_dict):
-        for i, layer in enumerate(self.layers):
-            w_key = f"W{i}"
-            b_key = f"b{i}"
-            if w_key in weight_dict:
-                layer.W = weight_dict[w_key].copy()
-            if b_key in weight_dict:
-                layer.b = weight_dict[b_key].copy()
+        idx = 0
+        for layer in self.layers:
+            if hasattr(layer, "W"):
+                layer.W = weight_dict[f"W{idx}"].copy()
+                layer.b = weight_dict[f"b{idx}"].copy()
+                idx += 1
 
