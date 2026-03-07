@@ -3,10 +3,12 @@ Data Loading and Preprocessing
 Handles MNIST and Fashion-MNIST datasets
 """
 
-import numpy as np
-from sklearn.datasets import fetch_openml
-from sklearn.model_selection import train_test_split
+# import numpy as np
+# from sklearn.datasets import fetch_openml
+# from sklearn.model_selection import train_test_split
 
+from tensorflow.keras.datasets import mnist, fashion_mnist
+import numpy as np
 
 def one_hot(y, num_classes=10):
     y = y.astype(int)
@@ -15,27 +17,19 @@ def one_hot(y, num_classes=10):
     return y_onehot
 
 
-def load_data(dataset_name="mnist"):
 
-    if dataset_name == "mnist":
-        data = fetch_openml('mnist_784', version=1, as_frame=False)
-    elif dataset_name == "fashion_mnist":
-        data = fetch_openml('Fashion-MNIST', version=1, as_frame=False)
-    else:
-        raise ValueError("Dataset must be 'mnist' or 'fashion_mnist'")
+def load_data(dataset):
 
-    X = data.data
-    y = data.target.astype(int)
+    if dataset == "mnist":
+        (X_train, y_train), (X_test, y_test) = mnist.load_data()
 
-    # Normalize
-    X = X / 255.0
+    elif dataset == "fashion_mnist":
+        (X_train, y_train), (X_test, y_test) = fashion_mnist.load_data()
 
-    # Train test split
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=10000, random_state=42
-    )
+    X_train = X_train.reshape(X_train.shape[0], -1) / 255.0
+    X_test = X_test.reshape(X_test.shape[0], -1) / 255.0
 
-    y_train = one_hot(y_train)
-    y_test = one_hot(y_test)
+    y_train = np.eye(10)[y_train]
+    y_test = np.eye(10)[y_test]
 
     return X_train, y_train, X_test, y_test
