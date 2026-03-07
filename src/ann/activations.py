@@ -14,9 +14,10 @@ class Sigmoid:
         return 1 / (1+ np.exp(-Z))
     
     def backward(self, dA):
-        A = 1 / (1+ np.exp(-self.Z))
-        return dA+A+(1-A)
-    
+        sig = 1 / (1 + np.exp(-self.Z))
+        dZ = dA * sig * (1 - sig)
+        return dZ
+        
 class Tanh:
     def __init__(self):
         self.Z = None
@@ -26,7 +27,9 @@ class Tanh:
         return np.tanh(Z)
     
     def backward(self, dA):
-        return dA * (1 - np.tanh(self.Z)**2)
+        t = np.tanh(self.Z)
+        dZ = dA * (1 - t**2)
+        return dZ
     
 class ReLU:
     def __init__(self):
@@ -37,6 +40,5 @@ class ReLU:
         return np.maximum(0,Z)
     
     def backward(self, dA):
-        dZ = np.array(dA, copy=True)
-        dZ[self.Z <= 0] = 0
+        dZ = dA * (self.Z > 0)
         return dZ
