@@ -1,0 +1,33 @@
+method: random
+
+metric:
+  name: val_accuracy
+  goal: maximize
+
+command:
+  - C:\Users\Swara\Coding\deepLearning\MLPforMNISTdata\MLPforMNISTdata\venv\Scripts\python.exe
+  - src/train.py
+  - ${args}
+
+parameters:
+
+  learning_rate:
+    values: [0.0005, 0.001, 0.005, 0.01]
+
+  batch_size:
+    values: [32, 64, 128]
+
+  hidden_layers:
+    values: [1,2,3,4]
+
+  num_neurons:
+    values: [64,128]
+
+  optimizer:
+    values: ["sgd","momentum","nag","rmsprop"]
+
+  activation:
+    values: ["relu","tanh","sigmoid"]
+
+  weight_init:
+    values: ["random", "xavier"]

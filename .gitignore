@@ -1,5 +1,18 @@
-venv
-__pycache__
-*.pyc   
+# Python
+__pycache__/
+*.pyc
 
+# Virtual environments
+venv/
+.env/
 
+# WandB logs
+wandb/
+
+# Model checkpoints
+*.npy
+
+# Matplotlib outputs
+*.png
+
+*.zip
